@@ -1,0 +1,49 @@
+name: Lego Backorder Monitor
+
+on:
+  schedule:
+    # Runs at 00:00 UTC every day (09:00 KST)
+    - cron: '0 0 * * *'
+  workflow_dispatch:
+
+jobs:
+  monitor:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v3
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.10'
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+          playwright install chromium
+
+      - name: Run Scraper and Notifier
+        id: run_script
+        env:
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+        run: |
+          python main.py > output.log
+          cat output.log
+          if grep -q "TERMINATION_CONDITION_MET=true" output.log; then
+            echo "terminate=true" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Disable Workflow if condition met
+        if: steps.run_script.outputs.terminate == 'true'
+        uses: actions/github-script@v6
+        with:
+          script: |
+            github.rest.actions.disableWorkflow({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              workflow_id: 'daily-run.yml'
+            });
