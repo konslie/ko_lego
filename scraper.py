@@ -9,11 +9,23 @@ SELECTOR = 'span[data-test="product-overview-availability"]'
 
 async def fetch_status():
     async with async_playwright() as p:
-        # Launch browser in headless mode
-        browser = await p.chromium.launch(headless=True)
-        # Create a new context with a standard user agent
+        # Launch browser in headless mode with extra arguments for evasion
+        browser = await p.chromium.launch(
+            headless=True,
+            args=[
+                '--no-sandbox',
+                '--disable-setuid-sandbox',
+                '--disable-blink-features=AutomationControlled',
+                '--disable-infobars',
+                '--window-size=1920,1080',
+            ]
+        )
+        # Create a new context with standard user agent and language matching local behaviors
         context = await browser.new_context(
-            user_agent='Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'
+            user_agent='Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+            viewport={'width': 1920, 'height': 1080},
+            locale='ko-KR',
+            timezone_id='Asia/Seoul'
         )
         page = await context.new_page()
         
@@ -22,10 +34,13 @@ async def fetch_status():
         
         try:
             # Navigate to the page
-            await page.goto(URL, wait_until='domcontentloaded', timeout=30000)
+            await page.goto(URL, wait_until='load', timeout=45000)
+            
+            # Wait a few seconds to let any popups or dynamic rendering finish
+            await page.wait_for_timeout(5000)
             
             # Wait for the specific availability element to appear
-            element = await page.wait_for_selector(SELECTOR, timeout=15000)
+            element = await page.wait_for_selector(SELECTOR, timeout=20000, state="attached")
             
             if element:
                 text = await element.inner_text()
