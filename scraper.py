@@ -25,19 +25,45 @@ async def fetch_status():
             user_agent='Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
             viewport={'width': 1920, 'height': 1080},
             locale='ko-KR',
-            timezone_id='Asia/Seoul'
+            timezone_id='Asia/Seoul',
+            java_script_enabled=True,
+            has_touch=False,
+            is_mobile=False
         )
         page = await context.new_page()
+        
+        # Inject realistic navigator properties
+        await page.add_init_script("""
+            Object.defineProperty(navigator, 'webdriver', {
+                get: () => undefined
+            });
+            Object.defineProperty(navigator, 'languages', {
+                get: () => ['ko-KR', 'ko', 'en-US', 'en']
+            });
+            Object.defineProperty(navigator, 'plugins', {
+                get: () => [1, 2, 3]
+            });
+        """)
         
         # Apply stealth to evade bot detection
         await stealth_async(page)
         
         try:
             # Navigate to the page
-            await page.goto(URL, wait_until='load', timeout=45000)
+            await page.goto(URL, wait_until='domcontentloaded', timeout=45000)
             
-            # Wait a few seconds to let any popups or dynamic rendering finish
+            # Wait a bit, then move the mouse to simulate human
+            await page.wait_for_timeout(2000)
+            await page.mouse.move(x=100, y=100)
+            await page.wait_for_timeout(1000)
+            await page.mouse.move(x=500, y=500)
+            await page.mouse.wheel(delta_x=0, delta_y=300)
+            
+            # Wait a few more seconds to let any popups or dynamic rendering finish
             await page.wait_for_timeout(5000)
+            
+            # Additional mouse movement
+            await page.mouse.move(x=200, y=200)
             
             # Wait for the specific availability element to appear
             element = await page.wait_for_selector(SELECTOR, timeout=20000, state="attached")

@@ -2,7 +2,7 @@
 
 ## [v1.0.2] - Action Reliability Update - 2026-03-10
 - Switched GitHub Actions runner from `ubuntu-latest` to `macos-latest` to avoid Linux datacenter IP blocks.
-- Added macOS matching User-Agent in `scraper.py`.
+- Added macOS matching User-Agent, Javascript properties injection, and simulated mouse movements in `scraper.py` to bypass strict Cloudflare Bot Detection (Captcha).
 - Implemented error screenshot capture and artifact upload on GitHub Actions for debugging timeouts.
 
 ## [v1.0.1] - Dependency Fix - 2026-03-10

@@ -10,8 +10,8 @@ Implementing a Playwright-based scraper and Telegram notifier managed by GitHub 
 
 ## Critical Technical Decisions & Roadblocks
 - Relying on `playwright-stealth` which faced some PyPI dependency issues locally inside Python 3.12 (`pkg_resources` missing); circumvented by pinning `setuptools<70.0.0` inside `requirements.txt` to restore compatibility.
-- Added early termination conditions so it doesn't run infinitely.
 - Encountered Telegram `Chat not found` error which indicates the Bot token or Chat ID is incorrect, or the user has not initiated a conversation with the bot via `/start`. 
+- GitHub Actions IP addresses are aggressively flagged by Lego.com's Cloudflare setup (Captcha "보안확인수행중"). Implemented Javascript property injections (`navigator.webdriver`, `languages`, `plugins`) and simulated mouse movements/scrolling to evade this layer.
 
 ## Next Step
 - Push the `macos-latest` runner changes and screenshot debugging to GitHub.
