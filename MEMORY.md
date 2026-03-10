@@ -9,8 +9,10 @@ Implementing a Playwright-based scraper and Telegram notifier managed by GitHub 
 - Added GitHub Actions `.github/workflows/daily-run.yml` enabling 09:00 KST daily runs and automatic workflow termination if backorder dates are changed before Mar 31st.
 
 ## Critical Technical Decisions & Roadblocks
-- Relying on `playwright-stealth` which faced some PyPI dependency issues locally inside Python 3.12 (`pkg_resources` missing); circumvented by testing in Python 3.10 and using `ubuntu-latest` (Python 3.10) for final GitHub Actions runtime where it evaluates successfully.
-- Added early termination conditions so it doesn't run infinitely. 
+- Relying on `playwright-stealth` which faced some PyPI dependency issues locally inside Python 3.12 (`pkg_resources` missing); circumvented by pinning `setuptools<70.0.0` inside `requirements.txt` to restore compatibility.
+- Added early termination conditions so it doesn't run infinitely.
+- Encountered Telegram `Chat not found` error which indicates the Bot token or Chat ID is incorrect, or the user has not initiated a conversation with the bot via `/start`. 
 
 ## Next Step
-- Final verification of the artifacts, wait for user to configure their Telegram Bot Tokens and push to GitHub so they can manually trigger the Action to confirm it runs well in the cloud.
+- Push the `macos-latest` runner changes and screenshot debugging to GitHub.
+- Manually trigger the GitHub Action and review the `error_screenshot.png` artifact to see what page the bot is given if a timeout still occurs.

@@ -22,7 +22,7 @@ async def fetch_status():
         )
         # Create a new context with standard user agent and language matching local behaviors
         context = await browser.new_context(
-            user_agent='Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+            user_agent='Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
             viewport={'width': 1920, 'height': 1080},
             locale='ko-KR',
             timezone_id='Asia/Seoul'
@@ -49,6 +49,10 @@ async def fetch_status():
                 return "Error: Element found but is empty."
                 
         except Exception as e:
+            try:
+                await page.screenshot(path="error_screenshot.png")
+            except:
+                pass
             return f"Error: {e}"
         finally:
             await browser.close()
