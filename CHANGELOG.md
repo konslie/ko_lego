@@ -1,5 +1,9 @@
 # Changelog
 
+## [v1.0.3] - Source Removal - 2026-03-11
+- Removed all source code and executable files from the remote repository as per user request, leaving only core project documentation.
+- Retained the local project directory and its contents intact.
+
 ## [v1.0.2] - Action Reliability Update - 2026-03-10
 - Switched GitHub Actions runner from `ubuntu-latest` to `macos-latest` to avoid Linux datacenter IP blocks.
 - Added macOS matching User-Agent, Javascript properties injection, and simulated mouse movements in `scraper.py` to bypass strict Cloudflare Bot Detection (Captcha).
