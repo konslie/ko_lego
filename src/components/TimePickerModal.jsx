@@ -8,11 +8,15 @@ const MINUTES_5 = Array.from({ length: 12 }, (_, i) => String(i * 5).padStart(2,
 function ScrollColumn({ items, selectedValue, onChange }) {
   const containerRef = useRef(null);
 
+  const REPEAT = 100;
+  const extendedItems = Array(REPEAT).fill(items).flat();
+  const MIDDLE_START_INDEX = Math.floor(REPEAT / 2) * items.length;
+
   useEffect(() => {
     if (containerRef.current) {
-      const index = items.indexOf(selectedValue);
-      if (index !== -1) {
-        containerRef.current.scrollTop = index * 40;
+      const indexInBase = items.indexOf(selectedValue);
+      if (indexInBase !== -1) {
+        containerRef.current.scrollTop = (MIDDLE_START_INDEX + indexInBase) * 40;
       }
     }
   }, []); // Only on mount
@@ -20,7 +24,8 @@ function ScrollColumn({ items, selectedValue, onChange }) {
   const handleScroll = (e) => {
     const scrollTop = e.target.scrollTop;
     const index = Math.round(scrollTop / 40);
-    const newVal = items[Math.min(items.length - 1, Math.max(0, index))];
+    const validIndex = Math.min(extendedItems.length - 1, Math.max(0, index));
+    const newVal = extendedItems[validIndex];
     if (newVal !== selectedValue) {
       onChange(newVal);
     }
@@ -30,8 +35,8 @@ function ScrollColumn({ items, selectedValue, onChange }) {
     <div className="scroll-column">
       <div className="scroll-window" ref={containerRef} onScroll={handleScroll}>
         <div className="scroll-padding"></div>
-        {items.map(item => (
-          <div key={item} className={`scroll-item ${item === selectedValue ? 'selected' : ''}`}>
+        {extendedItems.map((item, idx) => (
+          <div key={idx} className={`scroll-item ${item === selectedValue ? 'selected' : ''}`}>
             {item}
           </div>
         ))}
@@ -47,10 +52,10 @@ export default function TimePickerModal({ isOpen, onClose, dates, onSave, onDele
   const [careReason, setCareReason] = useState('');
   const [specialType, setSpecialType] = useState('체험학습');
   const [specialReason, setSpecialReason] = useState('');
-  const [startHour, setStartHour] = useState(4);
-  const [startMin, setStartMin] = useState('50');
-  const [endHour, setEndHour] = useState(6);
-  const [endMin, setEndMin] = useState('50');
+  const [startHour, setStartHour] = useState(5);
+  const [startMin, setStartMin] = useState('00');
+  const [endHour, setEndHour] = useState(7);
+  const [endMin, setEndMin] = useState('00');
   
   // Reset state or load existing log when modal opens
   useEffect(() => {
@@ -124,10 +129,10 @@ export default function TimePickerModal({ isOpen, onClose, dates, onSave, onDele
           setEndHour(enH);
           setEndMin(String(eM).padStart(2, '0'));
         } else {
-          setStartHour(4);
-          setStartMin('50');
-          setEndHour(6);
-          setEndMin('50');
+          setStartHour(5);
+          setStartMin('00');
+          setEndHour(7);
+          setEndMin('00');
         }
       } else {
         const todayOffset = new Date(new Date().getTime() + 9 * 60 * 60 * 1000); // KST
@@ -145,10 +150,10 @@ export default function TimePickerModal({ isOpen, onClose, dates, onSave, onDele
         setCareReason('');
         setSpecialType('체험학습');
         setSpecialReason('');
-        setStartHour(4);
-        setStartMin('50');
-        setEndHour(6);
-        setEndMin('50');
+        setStartHour(5);
+        setStartMin('00');
+        setEndHour(7);
+        setEndMin('00');
       }
     }
   }, [isOpen, existingLog, dates]);
